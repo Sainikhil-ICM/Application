@@ -1,18 +1,31 @@
-# Base image
-FROM node:14
+FROM node:18.16-alpine AS build
 
-# Set working directory
 WORKDIR /usr/src/app
 
-# Install dependencies
-COPY package.json yarn.lock ./
-RUN yarn install
+COPY package*.json ./
 
-# Copy all project files
 COPY . .
 
-# Expose port
-EXPOSE 3000
+RUN apk add -U tzdata
 
-# Run the app
-CMD ["yarn", "start"]
+ENV TZ=Asia/Kolkata
+
+RUN cp /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
+
+RUN  npm install
+ 
+RUN  yarn build
+
+FROM node:18.16-alpine
+
+COPY --from=build /usr/src/app/node_modules ./node_modules
+
+COPY --from=build /usr/src/app/package.json ./.
+
+COPY --from=build /usr/src/app/tsconfig.json ./tsconfig.json
+
+COPY --from=build /usr/src/app/dist ./dist
+
+COPY --from=build /usr/src/app/.env* ./.env
+
+CMD [ "yarn", "start" ]
