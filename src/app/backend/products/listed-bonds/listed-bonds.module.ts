@@ -1,0 +1,39 @@
+import {
+    Account,
+    AccountSchema,
+    Customer,
+    CustomerSchema,
+    Payment,
+    PaymentSchema,
+    User,
+    UserCustomer,
+    UserCustomerSchema,
+    UserProduct,
+    UserProductSchema,
+    UserSchema,
+} from 'src/models';
+import { Module } from '@nestjs/common';
+import { ListedBondsService } from './listed-bonds.service';
+import { ListedBondsController } from './listed-bonds.controller';
+import { MongooseModule } from '@nestjs/mongoose';
+import { BullModule } from '@nestjs/bull';
+import { QueueName } from 'src/constants/constants';
+import { ProductsRepository } from '../products.repository';
+import { ListedBondsRepository } from './listed-bonds.repository';
+
+@Module({
+    imports: [
+        MongooseModule.forFeature([
+            { name: Payment.name, schema: PaymentSchema },
+            { name: Customer.name, schema: CustomerSchema },
+            { name: User.name, schema: UserSchema },
+            { name: Account.name, schema: AccountSchema },
+            { name: UserProduct.name, schema: UserProductSchema },
+            { name: UserCustomer.name, schema: UserCustomerSchema },
+        ]),
+        BullModule.registerQueue({ name: QueueName.PRODUCTS_QUEUE }),
+    ],
+    controllers: [ListedBondsController],
+    providers: [ProductsRepository, ListedBondsService, ListedBondsRepository],
+})
+export class ListedBondsModule {}

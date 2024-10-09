@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: deployment-icm-partner
+    namespace: dev-common
+    labels:
+        app: adv-api
+spec:
+    replicas: 2
+    selector:
+        matchLabels:
+            app: adv-api
+    template:
+        metadata:
+            labels:
+                app: adv-api
+        spec:
+            serviceAccountName: partner-redis-allow
+            containers:
+                - name: adv-api
+                  image: 638545541512.dkr.ecr.ap-south-1.amazonaws.com/api-adv:uat252
+                  imagePullPolicy: Always
+                  ports:
+                      - containerPort: 3000
+            imagePullSecrets:
+                - name: regcred

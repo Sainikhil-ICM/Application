@@ -1,0 +1,38 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+    name: ingress-icm-partner
+    namespace: dev-common
+    labels:
+        app: adv-app
+    annotations:
+        alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:638545541512:certificate/7f6cb159-354c-4bb5-b516-5ea168077c95
+        alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80,"HTTPS": 443}]'
+        kubernetes.io/ingress.class: alb
+        alb.ingress.kubernetes.io/healthcheck-path: /v1/health
+        alb.ingress.kubernetes.io/healthcheck-interval-seconds: '300'
+        alb.ingress.kubernetes.io/scheme: internet-facing
+        alb.ingress.kubernetes.io/ssl-redirect: '443'
+        alb.ingress.kubernetes.io/load-balancer-name: 'uat-adv-alb'
+spec:
+    rules:
+        - host: 'uatkub.partner.incredmoney.com'
+          http:
+              paths:
+                  - path: /
+                    pathType: Prefix
+                    backend:
+                        service:
+                            name: service-icm-partner
+                            port:
+                                number: 80
+        - host: 'uatapi.partner.incredmoney.com'
+          http:
+              paths:
+                  - path: /
+                    pathType: Prefix
+                    backend:
+                        service:
+                            name: service-icm-partner
+                            port:
+                                number: 80
