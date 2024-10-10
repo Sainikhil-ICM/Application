@@ -26,4 +26,6 @@ COPY --from=build /usr/src/app/tsconfig.json ./tsconfig.json
 
 COPY --from=build /usr/src/app/dist ./dist
 
+COPY --from=build /usr/src/app/.env* ./.env
+
 CMD [ "yarn", "start" ]
